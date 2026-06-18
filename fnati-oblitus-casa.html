@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FNaTI & Oblitus Casa — A Casa Esquecida</title>
+<link href="https://fonts.googleapis.com/css2?family=Creepster&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black:   #0a0a0f;
+    --deep:    #0f0f1a;
+    --ink:     #151520;
+    --red:     #8b1a1a;
+    --redglow: #c0392b;
+    --dim:     #2a2a3a;
+    --muted:   #5a5a7a;
+    --pale:    #b0a8c0;
+    --cream:   #d8cfc0;
+    --white:   #f0ebe0;
+    --accent:  #6b1f1f;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--cream);
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 18px;
+    line-height: 1.75;
+    overflow-x: hidden;
+  }
+
+  /* ── SCANLINES OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.08) 2px,
+      rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  /* ── HEADER / CAPA ── */
+  header {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--black);
+    overflow: hidden;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 50% 60%, rgba(139,26,26,0.18) 0%, transparent 70%),
+      radial-gradient(ellipse 80% 40% at 50% 90%, rgba(60,0,0,0.5) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.85) 100%);
+    pointer-events: none;
+  }
+
+  .eyeball-grid {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    opacity: 0.06;
+    pointer-events: none;
+  }
+
+  .eyeball-grid span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    transform: rotate(var(--r, 0deg));
+    animation: blink var(--d, 4s) var(--delay, 0s) infinite;
+  }
+
+  @keyframes blink {
+    0%, 90%, 100% { opacity: 1; }
+    95% { opacity: 0; }
+  }
+
+  .eyeball-grid span:nth-child(3n)  { --r: 45deg; --d: 6s; --delay: 1s; }
+  .eyeball-grid span:nth-child(5n)  { --r: -30deg; --d: 3s; --delay: 2s; }
+  .eyeball-grid span:nth-child(7n)  { --r: 90deg; --d: 8s; --delay: 0.5s; }
+
+  .header-content { position: relative; z-index: 2; }
+
+  .eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 2rem;
+  }
+
+  h1 {
+    font-family: 'Creepster', cursive;
+    font-size: clamp(3.5rem, 10vw, 7rem);
+    font-weight: 400;
+    color: var(--white);
+    line-height: 0.95;
+    letter-spacing: 0.02em;
+    text-shadow:
+      0 0 40px rgba(192,57,43,0.4),
+      0 0 80px rgba(139,26,26,0.2);
+    margin-bottom: 1rem;
+  }
+
+  h1 span { color: var(--redglow); }
+
+  .subtitle-title {
+    font-family: 'Creepster', cursive;
+    font-size: clamp(1.4rem, 4vw, 2.2rem);
+    color: var(--pale);
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    margin-bottom: 2.5rem;
+  }
+
+  .frase-impacto {
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+    font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+    color: var(--cream);
+    max-width: 640px;
+    margin: 0 auto 3rem;
+    line-height: 1.6;
+    opacity: 0.85;
+  }
+
+  .scroll-hint {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    color: var(--muted);
+    text-transform: uppercase;
+    animation: pulse 2.5s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(10,10,15,0.95);
+    border-bottom: 1px solid var(--dim);
+    padding: 0.8rem 2rem;
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  nav a {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  nav a:hover { color: var(--redglow); }
+
+  /* ── SECTIONS ── */
+  section {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 6rem 2rem;
+    border-bottom: 1px solid var(--dim);
+  }
+
+  section:last-child { border-bottom: none; }
+
+  .section-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 1rem;
+  }
+
+  h2 {
+    font-family: 'Creepster', cursive;
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 400;
+    color: var(--white);
+    line-height: 1.1;
+    margin-bottom: 2rem;
+    letter-spacing: 0.03em;
+  }
+
+  h3 {
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--pale);
+    margin-bottom: 0.75rem;
+    margin-top: 2.5rem;
+  }
+
+  p { margin-bottom: 1.2rem; color: var(--cream); }
+  p:last-child { margin-bottom: 0; }
+
+  em { color: var(--pale); font-style: italic; }
+  strong { color: var(--white); font-weight: 600; }
+
+  /* ── SINOPSE ── */
+  .quote-block {
+    border-left: 3px solid var(--red);
+    margin: 2.5rem 0;
+    padding: 1.2rem 1.8rem;
+    background: rgba(139,26,26,0.07);
+  }
+
+  .quote-block p {
+    font-style: italic;
+    font-size: 1.15rem;
+    color: var(--pale);
+    margin: 0;
+  }
+
+  /* ── TEMAS: CARDS ── */
+  .temas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  .tema-card {
+    border: 1px solid var(--dim);
+    padding: 1.5rem;
+    background: var(--deep);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .tema-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--red);
+  }
+
+  .tema-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--red);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+  }
+
+  .tema-card h3 {
+    font-family: 'Creepster', cursive;
+    font-size: 1.4rem;
+    color: var(--white);
+    font-weight: 400;
+    letter-spacing: 0.05em;
+    margin: 0 0 0.75rem;
+  }
+
+  .tema-card p { font-size: 0.95rem; color: var(--pale); margin: 0; }
+
+  /* ── SOBRE O AUTOR ── */
+  .autor-box {
+    background: var(--deep);
+    border: 1px solid var(--dim);
+    padding: 2rem;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 2rem;
+    align-items: start;
+    margin-top: 2rem;
+  }
+
+  .autor-icon {
+    width: 72px;
+    height: 72px;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Creepster', cursive;
+    font-size: 1.6rem;
+    color: var(--cream);
+    flex-shrink: 0;
+  }
+
+  /* ── OPINIÃO ── */
+  .opiniao-highlight {
+    background: rgba(139,26,26,0.12);
+    border: 1px solid rgba(139,26,26,0.3);
+    padding: 2rem;
+    margin: 2rem 0;
+    position: relative;
+  }
+
+  .opiniao-highlight::before {
+    content: '"';
+    font-family: 'Creepster', cursive;
+    font-size: 6rem;
+    color: var(--red);
+    opacity: 0.25;
+    position: absolute;
+    top: -1rem;
+    left: 1rem;
+    line-height: 1;
+  }
+
+  .nota {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .nota-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .estrelas { font-size: 1.4rem; letter-spacing: 0.1em; }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: var(--black);
+    border-top: 1px solid var(--dim);
+  }
+
+  footer p {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  footer p a {
+    color: var(--muted);
+    text-decoration: none;
+    border-bottom: 1px solid var(--dim);
+  }
+
+  /* ── SEPARATOR ── */
+  .sep {
+    display: block;
+    width: 48px;
+    height: 2px;
+    background: var(--red);
+    margin: 2rem 0;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .autor-box { grid-template-columns: 1fr; }
+    nav { gap: 1rem; padding: 0.6rem 1rem; }
+  }
+
+  /* ── FADE IN ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .header-content { animation: fadeUp 1.2s ease both; }
+  .header-content .frase-impacto { animation: fadeUp 1.4s 0.3s ease both; }
+</style>
+</head>
+<body>
+
+<!-- CAPA -->
+<header>
+  <div class="vignette"></div>
+  <div class="eyeball-grid" aria-hidden="true">
+    <!-- 40 olhos decorativos -->
+    <span>👁</span><span>👁</span><span>👁</span><span>👁</span><span>👁</span><span>👁</span><span>👁</span><span>👁</span>
+    <span>👁</span><span>👁</span><span>👁</span><span>👁</span><span>👁</span><span>👁</span><span>👁</span><span>👁</span>
+    <span>👁</span><span>👁</span><span>👁</span><span>👁</span><span>👁</span><span>👁</span><span>👁</span><span>👁</span>
+    <span>👁</span><span>👁</span><span>👁</span><span>👁</span><span>👁</span><span>👁</span><span>👁</span><span>👁</span>
+    <span>👁</span><span>👁</span><span>👁</span><span>👁</span><span>👁</span><span>👁</span><span>👁</span><span>👁</span>
+  </div>
+
+  <div class="header-content">
+    <p class="eyebrow">Trabalho de Português — Obra Favorita</p>
+    <h1>FNaTI &<br><span>Oblitus Casa</span></h1>
+    <p class="subtitle-title">A Casa Esquecida</p>
+    <p class="frase-impacto">
+      Alguns lugares não ficam abandonados por acidente.<br>
+      Alguns lugares te esperam.
+    </p>
+    <p class="scroll-hint">▼ &nbsp; role para explorar &nbsp; ▼</p>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav>
+  <a href="#sinopse">Sinopse</a>
+  <a href="#autor">Criador</a>
+  <a href="#temas">Temas</a>
+  <a href="#opiniao">Minha opinião</a>
+</nav>
+
+<!-- SINOPSE -->
+<section id="sinopse">
+  <p class="section-eyebrow">01 — Sinopse</p>
+  <h2>A ilha que não deixa ir</h2>
+  <span class="sep"></span>
+
+  <p>
+    <strong>Five Nights at Treasure Island (FNaTI)</strong> começa em 2003, quando um grupo de pessoas é enviado para investigar rumores perturbadores sobre a <em>Discovery Island</em>, um antigo parque temático da Disney abandonado há anos. Entre eles está <strong>Jake Smith</strong>, um jovem funcionário que logo percebe que os rumores eram mais do que simples histórias.
+  </p>
+  <p>
+    Dentro das instalações decadentes e tomadas pelo mofo, criaturas grotescas habitam os corredores: versões distorcidas e corrompidas dos personagens mais icônicos da Disney — sem olhos, com membros retorcidos, emanando algo que não é possível descrever como vivo ou morto. Jake precisa sobreviver às noites enquanto monitora câmeras de segurança, impedindo que esses seres o encontrem.
+  </p>
+
+  <div class="quote-block">
+    <p>"Bem-vindo de volta à ilha."</p>
+  </div>
+
+  <p>
+    <strong>Oblitus Casa</strong> — cujo nome significa <em>"Casa Esquecida"</em> (do latim e do italiano/espanhol) — é o capítulo final da saga. Ambientado em dezembro de 2004, Jake foi encontrado após desaparecer na ilha e agora é interrogado pelo Dr. Jared Rowley como suspeito pelo desaparecimento de seus colegas. Relutante mas resignado, Jake começa a narrar o que aconteceu naquela cabana — e o pesadelo recomeça.
+  </p>
+  <p>
+    Com jogabilidade renovada, arte detalhada e design de som atmosférico, <em>Oblitus Casa</em> aprofunda os mistérios da ilha e oferece uma conclusão às histórias que FNaTI começou a contar.
+  </p>
+
+  <h3>Como se joga?</h3>
+  <p>
+    Ambos os jogos são de <em>point-and-click</em> com câmeras de vigilância. O jogador monitora os ambientes da ilha pela noite, identificando onde as criaturas estão e tomando ações para impedi-las de chegar até Jake — apagar luzes, fechar passagens, ou simplesmente não olhar para certas câmeras. A tensão vem não só do perigo, mas do desconforto visual constante: aqueles corredores escuros, aquelas figuras encarando a câmera em silêncio absoluto.
+  </p>
+</section>
+
+<!-- AUTOR -->
+<section id="autor">
+  <p class="section-eyebrow">02 — Criador</p>
+  <h2>Radiance Team</h2>
+  <span class="sep"></span>
+
+  <div class="autor-box">
+    <div class="autor-icon">RT</div>
+    <div>
+      <p>
+        O <strong>Radiance Team</strong> é um grupo independente de desenvolvedores de jogos amadores que assumiu a responsabilidade de transformar um conceito frágil em algo robusto, coeso e perturbador. O projeto FNaTI começou como uma pequena demo criada pelo artista <strong>AnArt1996</strong> no DeviantArt, inspirado na creepypasta <em>"Abandoned by Disney"</em> do autor Slimebeast.
+      </p>
+      <p>
+        Ao longo de mais de seis anos, a propriedade passou por diferentes mãos até chegar ao Radiance, que reconstruiu o jogo do zero e o levou a uma versão completa — incluindo arte, modelagem 3D, programação, atuação de voz e design de som. A equipe conta com nomes como <em>Swirlhead</em> (diretor de arte e modelagem), <em>Nocturnum</em> (narrativa e direção), <em>JustDelta</em> e vários outros colaboradores apaixonados.
+      </p>
+      <p>
+        Tudo isso foi feito de forma gratuita, por amor ao projeto e à comunidade de fãs — algo que torna a conquista ainda mais impressionante.
+      </p>
+    </div>
+  </div>
+
+  <h3>A creepypasta por trás da obra</h3>
+  <p>
+    A base da série é <em>"Abandoned by Disney"</em>, uma história fictícia publicada online que imagina o que aconteceria se a Disney tivesse abandonado um parque secreto — e o que voltaria a habitar aquele lugar. FNaTI e Oblitus Casa pegam essa premissa e a expandem com uma história própria, personagens aprofundados e uma mitologia crescente.
+  </p>
+</section>
+
+<!-- TEMAS -->
+<section id="temas">
+  <p class="section-eyebrow">03 — Temas</p>
+  <h2>O que a obra quer dizer</h2>
+  <span class="sep"></span>
+  <p>Por baixo do horror de saltos e dos monstros sem olhos, FNaTI e Oblitus Casa exploram temas que vão muito além do susto fácil.</p>
+
+  <div class="temas-grid">
+    <div class="tema-card">
+      <p class="tema-num">Tema I</p>
+      <h3>Abandono e esquecimento</h3>
+      <p>A ilha é um símbolo daquilo que foi descartado. Os personagens que a habitam são versões deformadas de ícones culturais que o mundo preferiu ignorar. O esquecimento, aqui, é apresentado como algo violento.</p>
+    </div>
+    <div class="tema-card">
+      <p class="tema-num">Tema II</p>
+      <h3>Trauma e memória</h3>
+      <p>A narrativa de Oblitus Casa é construída como um flashback forçado: Jake é obrigado a reviver o que quer esquecer. O jogo trata a memória traumática como um lugar que continua vivo — e perigoso.</p>
+    </div>
+    <div class="tema-card">
+      <p class="tema-num">Tema III</p>
+      <h3>A infância corrompida</h3>
+      <p>Usar personagens infantis como o Mickey Mouse em formas grotescas é uma escolha que questiona a inocência forçada da cultura pop e o que há por baixo da fantasia vendida às crianças.</p>
+    </div>
+    <div class="tema-card">
+      <p class="tema-num">Tema IV</p>
+      <h3>O desconhecido como ameaça</h3>
+      <p>A série pertence ao gênero do horror cósmico: o que assusta não é o que é mostrado, mas o que fica nas sombras. As criaturas não têm motivação clara — e isso é exatamente o que as torna aterrorizantes.</p>
+    </div>
+  </div>
+</section>
+
+<!-- OPINIÃO -->
+<section id="opiniao">
+  <p class="section-eyebrow">04 — Minha Opinião</p>
+  <h2>Por que eu recomendo</h2>
+  <span class="sep"></span>
+
+  <div class="opiniao-highlight">
+    <p>
+      FNaTI e Oblitus Casa são obras que ficam na cabeça muito depois de você fechar o jogo. Não pela mecânica ou pelos gráficos — mas pelo <em>clima</em>. Existe algo genuinamente inquietante em caminhar por corredores onde personagens que deveriam ser felizes e coloridos olham para você com órbitas vazias. É desconforto estético transformado em narrativa.
+    </p>
+  </div>
+
+  <p>
+    O que me impressionou desde o começo foi a <strong>consistência da atmosfera</strong>. Muitos jogos de horror dependem de sustos baratos. Aqui, o horror vem do silêncio, da escuridão, da sensação de que algo está sempre observando — mesmo quando as câmeras não mostram nada. A ilha parece <em>viva</em> de uma forma que não deveria ser possível para um lugar tão decadente.
+  </p>
+  <p>
+    Oblitus Casa eleva tudo isso ao adicionar uma camada narrativa mais sofisticada. A estrutura do interrogatório dá ao jogo uma dimensão quase literária: estamos lendo uma confissão, acompanhando alguém sendo forçado a reviver o insuportável. Isso muda completamente a experiência — não somos apenas jogadores, somos testemunhas.
+  </p>
+  <p>
+    Recomendo para quem aprecia horror psicológico, arte visual de qualidade e histórias que não entregam tudo de bandeja. FNaTI e Oblitus Casa exigem atenção e recompensam quem se permite ficar desconfortável.
+  </p>
+
+  <div class="nota">
+    <span class="nota-label">Minha nota</span>
+    <span class="estrelas">★★★★★</span>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>Trabalho de Português — Obra Favorita &nbsp;|&nbsp; FNaTI & Oblitus Casa por Radiance Team</p>
+  <br>
+  <p style="margin-top: 0.5rem;">Jogo disponível gratuitamente em <a href="https://gamejolt.com/games/OblitusCasa/356260" target="_blank">Game Jolt</a></p>
+</footer>
+
+</body>
+</html>
